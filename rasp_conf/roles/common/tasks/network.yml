@@ -1,0 +1,9 @@
+---
+- name: inventory name to hostname
+  hostname:
+    name: "{{ inventory_hostname }}"
+
+- name: "Set nameserver"
+  lineinfile: dest=/etc/dhcpcd.conf regexp='.*{{ dns_ip }}$' line="static domain_name_servers={{ dns_ip }}" state=present
+  when: "'dns_server' not in group_names"
+  notify: ["dhcpcd restart"]

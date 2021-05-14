@@ -1,0 +1,15 @@
+---
+
+all:
+  hosts: 
+      pi1:
+        ansible_ssh_host: 192.168.1.68
+      pi2:
+        ansible_ssh_host: 192.168.1.69
+      pi3:
+        ansible_ssh_host: 192.168.1.70
+  children:
+    dns_server:
+      hosts:
+        pi1:
+  

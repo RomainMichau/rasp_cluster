@@ -1,0 +1,24 @@
+---
+
+- name: init raspberry
+  hosts: all
+  gather_facts: no
+  become: true    
+  roles:
+    - name: common      
+
+- name: init DNS server
+  hosts: dns_server
+  become: true  
+  roles:
+    - name: dnsmasq
+  tags:
+    - dns
+
+- name: Install apache
+  hosts: all
+  become: true  
+  roles:
+    - name: apache
+  tags:
+    - apache

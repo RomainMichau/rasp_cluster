@@ -1,0 +1,10 @@
+---
+
+- name: "Manage users"
+  include: "users.yml"
+
+- name: "Install and update packages"
+  include: "packages.yml"
+
+- name: "Manage network"
+  include: "network.yml"

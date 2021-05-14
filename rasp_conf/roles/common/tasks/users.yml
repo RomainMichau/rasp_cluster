@@ -1,0 +1,40 @@
+---
+
+- name: Make sure we have a 'wheel' group
+  group:
+    name: wheel
+    state: present
+
+- name: Allow 'wheel' group to have passwordless sudo
+  lineinfile:
+    dest: /etc/sudoers
+    state: present
+    regexp: '^%wheel'
+    line: '%wheel ALL=(ALL) NOPASSWD: ALL'
+    validate: 'visudo -cf %s'
+
+- name: Add the user {{item.username}} 
+  ansible.builtin.user:
+    name: "{{item.username}}"
+    groups: wheel
+    append: yes
+    state: present
+    createhome: yes
+  with_items: "{{ users }}"
+
+- name: "change {{ item.username }} password"
+  user:
+    name: "{{ item.username }}"
+    update_password: always
+    password: "{{ item.password }}"
+  when: "item.password is defined"
+  with_items: "{{ users }}" 
+  
+
+- name: "Set authorized key took from file for user {{item.username}}"
+  authorized_key:
+    user: "{{item.username}}"
+    state: present
+    key: "{{ lookup('file', '/home/rmichau/.ssh/id_rsa.pub') }}"
+  with_items: "{{ users }}"
+  

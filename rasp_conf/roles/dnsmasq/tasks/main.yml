@@ -1,0 +1,38 @@
+---
+
+- name: Print the gateway for each host when defined
+  ansible.builtin.debug:
+    msg: System {{ groups['all'] }}
+
+- name: "Build hosts file"
+  lineinfile: dest=/etc/hosts regexp='.*{{ item }}$' line="{{ hostvars[item].ansible_ssh_host }} {{item}}" state=present
+  when: hostvars[item].ansible_ssh_host is defined
+  with_items: "{{ groups.all }}"
+
+
+- name: Install dnsmasks
+  apt:
+    name: vim
+    state: present
+
+- name: "dnsmasq started"
+  service:
+    name: "dnsmasq"
+    state: "started"
+
+- name: import dnsmasq conf
+  copy:
+    src: dnsmasq.conf
+    dest: /etc/dnsmasq.conf
+    owner: root
+    group: root
+    mode: '0644'
+  changed_when: yes
+  notify: ["dnsmasq restart"]
+
+
+
+#- name: "Build hosts file"
+ # lineinfile: dest=/etc/hosts regexp='.*{{ item }}$' line="{{ hostvars[item].ansible_default_ipv4.address }} {{item}}" state=present
+  #when: hostvars[item].ansible_default_ipv4.address is defined
+  #with_items: groups['all']

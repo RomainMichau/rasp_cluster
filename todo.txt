@@ -1,0 +1,2 @@
+- create user rmichau
+- migrate to default python3
