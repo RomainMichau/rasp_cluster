@@ -22,3 +22,11 @@
     - name: apache
   tags:
     - apache
+  
+- name: Install Jenkins
+  hosts: jenkins_server
+  become: true  
+  roles:
+    - name: jenkins
+  tags:
+    - jenkins

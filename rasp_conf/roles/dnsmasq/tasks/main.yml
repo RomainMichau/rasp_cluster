@@ -12,7 +12,7 @@
 
 - name: Install dnsmasks
   apt:
-    name: vim
+    name:  dnsmasq
     state: present
 
 - name: "dnsmasq started"

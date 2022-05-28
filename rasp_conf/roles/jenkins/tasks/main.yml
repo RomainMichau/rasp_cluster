@@ -1,0 +1,13 @@
+---
+- name: Make sure we have java11 installed
+  apt:
+    name: openjdk-11-jdk
+    state: present
+- name: Install jenkins
+  apt:
+    deb: https://mirrors.jenkins.io/debian-stable/jenkins_2.332.3_all.deb
+    state: present
+- name: "jenkins start"
+  service:
+    name: "jenkins"
+    state: "started"

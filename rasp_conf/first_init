@@ -1,3 +1,4 @@
 #!/bin/bash
 source ./.venv/bin/activate
-sshpass -p "raspberry" ansible-playbook ./init-rasp.yml --user pi  -k 
+# sshpass -p "raspberry" ansible-playbook ./init-rasp.yml --user pi  -k --tags "jenkins"
+sshpass -p "raspberry" ansible-playbook ./init-rasp.yml --user pi  -k --tags "jenkins"

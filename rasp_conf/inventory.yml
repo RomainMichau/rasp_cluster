@@ -12,4 +12,7 @@ all:
     dns_server:
       hosts:
         pi1:
+    jenkins_server:
+      hosts:
+        pi1:
   
