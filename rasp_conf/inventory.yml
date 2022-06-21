@@ -15,4 +15,7 @@ all:
     jenkins_server:
       hosts:
         pi1:
+    postgres:
+      hosts:
+        pi1:
   

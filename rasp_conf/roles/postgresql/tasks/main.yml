@@ -1,0 +1,80 @@
+---
+
+
+- name: include secrets
+  include_vars: vault.yml
+  #no_log: True
+
+
+- name: Install stuff
+  apt:
+    name: " {{ item }} "
+    state: present
+  with_items:
+    - postgresql
+    - postgresql-contrib
+    - python3-pip
+    - acl
+    - ufw
+
+- name: "Install Python packages"
+  pip: "name={{ item }}  state=present"
+  with_items:
+    - psycopg2-binary
+
+- name: "Create tricount_analyzer database {{ db_name }}"
+  postgresql_db:
+    state: present
+    name: "{{ db_name }}"
+  become: yes
+  become_user: postgres
+
+- name: "Create db user {{ db_user }}"
+  postgresql_user:
+    state: present
+    name: "{{ db_user }}"
+    password: "{{ db_password }}"
+  become: yes
+  become_user: postgres
+
+- name: "Grant db user access to app db"
+  postgresql_privs:
+    type: database
+    database: "{{ db_name }}"
+    roles: "{{ db_user }}"
+    grant_option: no
+    privs: all
+  become: yes
+  become_user: postgres
+  notify: postgresql restart
+
+- name: Allow all access to tcp port allow
+  community.general.ufw:
+    rule: allow
+    port: '5432'
+    proto: tcp
+
+- name: "Allow md5 connection for the db user"
+  postgresql_pg_hba:
+    dest: "/etc/postgresql/11/main/pg_hba.conf"
+    contype: host
+    databases: all
+    method: md5
+    users: "{{ db_user }}"
+    address: "192.168.1.0/24 "
+    create: true
+  become: yes
+  become_user: postgres
+  notify: postgresql restart
+
+- name: "Configure PostgreSQL. Set listen_addresses"
+  lineinfile: dest=/etc/postgresql/11/main/postgresql.conf
+    regexp="listen_addresses =" line="listen_addresses = '*'" state=present
+  notify: postgresql restart
+  become: yes
+  become_user: postgres
+
+- name: "Start and enable services"
+  service: "name={{ item }} state=started enabled=yes"
+  with_items:
+    - postgresql

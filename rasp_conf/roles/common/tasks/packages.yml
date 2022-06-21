@@ -14,3 +14,13 @@
   apt:
     name: vim
     state: present
+
+- name: Make sure we have git installed
+  apt:
+    name: vim
+    state: present
+
+- name: Make sure we docker git installed
+  apt:
+    name: vim
+    state: present

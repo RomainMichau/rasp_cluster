@@ -30,3 +30,11 @@
     - name: jenkins
   tags:
     - jenkins
+
+- name: Install and init postgre
+  hosts: postgres
+  become: true  
+  roles:
+    - name: postgresql
+  tags:
+    - postgresql
