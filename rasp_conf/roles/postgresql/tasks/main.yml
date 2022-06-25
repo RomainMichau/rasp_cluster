@@ -1,9 +1,6 @@
 ---
 
 
-- name: include secrets
-  include_vars: vault.yml
-  #no_log: True
 
 
 - name: Install stuff
@@ -29,24 +26,57 @@
   become: yes
   become_user: postgres
 
-- name: "Create db user {{ db_user }}"
+- name: "Create db user {{ rw_db_user }}"
   postgresql_user:
     state: present
-    name: "{{ db_user }}"
-    password: "{{ db_password }}"
+    name: "{{ rw_db_user }}"
+    password: "{{ rw_user_db_password }}"
   become: yes
   become_user: postgres
 
-- name: "Grant db user access to app db"
+- name: "Create db user {{ ro_db_user }}"
+  postgresql_user:
+    state: present
+    name: "{{ ro_db_user }}"
+    password: "{{ ro_user_db_password }}"
+  become: yes
+  become_user: postgres
+
+- name: "Grant db rw_db_user rw access to app db"
   postgresql_privs:
     type: database
     database: "{{ db_name }}"
-    roles: "{{ db_user }}"
+    roles: "{{ rw_db_user }}"
     grant_option: no
     privs: all
   become: yes
   become_user: postgres
   notify: postgresql restart
+
+- name: "Grant db ro_db_user connect access to app db"
+  postgresql_privs:
+    type: database
+    database: "{{ db_name }}"
+    roles: "{{ ro_db_user }}"
+    grant_option: no
+    privs: CONNECT
+  become: yes
+  become_user: postgres
+  notify: postgresql restart
+
+- name: "Grant db ro_db_user ro access to app db"
+  postgresql_privs:
+    type: table
+    database: "{{ db_name }}"
+    roles: "{{ ro_db_user }}"
+    grant_option: no
+    privs: SELECT
+    schema: public
+    objs: ALL_IN_SCHEMA
+  become: yes
+  become_user: postgres
+  notify: postgresql restart
+
 
 - name: Allow all access to tcp port allow
   community.general.ufw:
@@ -54,18 +84,38 @@
     port: '5432'
     proto: tcp
 
-- name: "Allow md5 connection for the db user"
+- name: "Allow md5 connection for all db user"
   postgresql_pg_hba:
     dest: "/etc/postgresql/11/main/pg_hba.conf"
     contype: host
     databases: all
     method: md5
-    users: "{{ db_user }}"
+    users: "{{ item }}"
     address: "192.168.1.0/24 "
     create: true
   become: yes
   become_user: postgres
   notify: postgresql restart
+  with_items:
+    - "{{ rw_db_user }}"
+    - "{{ ro_db_user }}"
+
+- name: "Allow md5 connection for all db user"
+  postgresql_pg_hba:
+    dest: "/etc/postgresql/11/main/pg_hba.conf"
+    contype: host
+    databases: all
+    method: md5
+    users: "{{ item }}"
+    address: "172.16.0.0/12"
+    create: true
+  become: yes
+  become_user: postgres
+  notify: postgresql restart
+  with_items:
+    - "{{ rw_db_user }}"
+    - "{{ ro_db_user }}"
+
 
 - name: "Configure PostgreSQL. Set listen_addresses"
   lineinfile: dest=/etc/postgresql/11/main/postgresql.conf

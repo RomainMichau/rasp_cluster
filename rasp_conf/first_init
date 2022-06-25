@@ -1,5 +1,5 @@
 #!/bin/bash
 source ./.venv/bin/activate
 # sshpass -p "raspberry" ansible-playbook ./init-rasp.yml --user pi  -k --tags "jenkins"
-ansible-playbook ./init-rasp.yml --user pi --ask-vault-password --tags  "postgresql"
+ansible-playbook ./init-rasp.yml --user pi --ask-vault-password --tags  "trilyzer"
 

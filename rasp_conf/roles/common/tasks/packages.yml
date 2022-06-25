@@ -20,7 +20,7 @@
     name: vim
     state: present
 
-- name: Make sure we docker git installed
+- name: Make sure we vim git installed
   apt:
     name: vim
     state: present

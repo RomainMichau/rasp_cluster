@@ -1,0 +1,7 @@
+---
+- name: restart trilyzer
+  systemd:
+    name: trilyzer
+    state: restarted
+    enabled: yes
+    daemon_reload: yes

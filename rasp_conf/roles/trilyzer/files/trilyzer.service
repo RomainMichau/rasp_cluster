@@ -1,0 +1,17 @@
+[Unit]
+Description=trilyzer
+After=docker.service
+Requires=docker.service
+
+[Service]
+EnvironmentFile=/opt/trilyzer/trilyzer_env
+TimeoutStartSec=60
+TimeoutStopSec=60
+Restart=always
+ExecStart=/usr/bin/docker run -p ${PORT}:8080 --rm --name trilyzer trilyzer  --db_hostname ${DB_HOSTNAME} --db_password ${DB_PASSWORD} --db_user ${DB_USER} --user_password ${API_USER_PASSWORD} --admin_password ${API_ADMIN_PASSWORD}
+ExecStop=/usr/bin/docker stop trilyzer
+User=trilyzer
+Group=trilyzer
+
+[Install]
+WantedBy=multi-user.target

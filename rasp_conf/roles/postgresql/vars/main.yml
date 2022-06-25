@@ -1,3 +1,4 @@
 ---
-db_user: postgres
+rw_db_user: postgres
+ro_db_user: postgres_ro
 db_name: tricount

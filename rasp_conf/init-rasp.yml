@@ -38,3 +38,20 @@
     - name: postgresql
   tags:
     - postgresql
+
+- name: Install and init grafana
+  hosts: grafana
+  become: true  
+  roles:
+    - name: grafana
+  tags:
+    - grafana
+
+
+- name: Install and init trilyzer
+  hosts: trilyzer
+  become: true  
+  roles:
+    - name: trilyzer
+  tags:
+    - trilyzer

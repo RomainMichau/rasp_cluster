@@ -18,4 +18,10 @@ all:
     postgres:
       hosts:
         pi1:
+    grafana:
+      hosts:
+        pi1:
+    trilyzer:
+      hosts:
+        pi1:
   

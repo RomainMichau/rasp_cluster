@@ -1,0 +1,103 @@
+---
+- name: Install apt-transport-https
+  ansible.builtin.apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - lsb-release
+      - gnupg
+    state: latest
+    update_cache: true
+
+
+- name: Add signing key
+  ansible.builtin.apt_key:
+    url: "https://download.docker.com/linux/{{ ansible_distribution | lower }}/gpg"
+    state: present
+
+- name: Add repository into sources list
+  ansible.builtin.apt_repository:
+    repo: "deb [arch={{ ansible_architecture }}] https://download.docker.com/linux/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} stable"
+    state: present
+    filename: docker
+
+- name: Install Docker
+  ansible.builtin.apt:
+    name:
+      - docker
+      - docker.io
+      - docker-compose
+      - docker-registry
+    state: latest
+    update_cache: true
+  
+# - name: Start a container with a command
+#   docker_container:
+#     name: sleepy
+#     image: hello-world
+
+- name: Git clone trilyzer
+  ansible.builtin.git:
+    repo: 'https://github.com/RomainMichau/tricount_analyzer.git'
+    dest: /opt/trilyzer
+  notify:
+    - restart trilyzer
+
+- name: remove image
+  community.docker.docker_image:
+    build:
+      path: /opt/trilyzer
+    source: build
+    name: trilyzer
+    force_absent: yes
+    state: absent
+
+- name: Build an image and push 
+  community.docker.docker_image:
+    build:
+      path: /opt/trilyzer
+    source: build
+    name: trilyzer
+  notify:
+    - restart trilyzer
+
+- name: create trilyzer group
+  group:
+    name: trilyzer
+    state: present
+
+- name: Add the user trilyzer
+  ansible.builtin.user:
+    name: trilyzer
+    append: yes
+    state: present
+    home: /opt/trilyzer
+    groups: trilyzer,docker
+    createhome: yes
+
+- name: copy param used by trilyzer
+  template:
+    src: trilyzer_env.j2
+    dest: /opt/trilyzer/trilyzer_env
+    owner: trilyzer
+    group: trilyzer
+    mode: 0600
+  notify:
+    - restart trilyzer
+
+- name: Copy systemd service file to server
+  copy:
+    src: trilyzer.service
+    dest: /etc/systemd/system
+    owner: root
+    group: root
+  notify:
+    - restart trilyzer
+
+# - name: run trilyzer
+#   docker:
+#     name: trilyzer
+#     image: trilyzer
+#     ports:
+#     - "8080:9000"
+#     state: present
