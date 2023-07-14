@@ -55,3 +55,14 @@
     - name: trilyzer
   tags:
     - trilyzer
+
+- name: Install GitHub Actions Runner
+  hosts: all
+  become: yes
+  tags:
+    - github-runner
+  vars_files:
+    - group_vars/github_worker/secrets.yml
+    - group_vars/github_worker/vars.yml
+  roles:
+    - monolithprojects.github_actions_runner
