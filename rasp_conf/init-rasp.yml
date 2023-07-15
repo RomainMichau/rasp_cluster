@@ -6,6 +6,8 @@
   become: true    
   roles:
     - name: common      
+  tags:
+    - common
 
 - name: init DNS server
   hosts: dns_server
@@ -57,7 +59,7 @@
     - trilyzer
 
 - name: Install GitHub Actions Runner
-  hosts: all
+  hosts: github_workers
   become: yes
   tags:
     - github-runner

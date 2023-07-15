@@ -1,5 +1,5 @@
 github_account: RomainMichau
-github_repo: Connect4Solver_rust
+github_repo: rokim_conf
 runner_user: "github-worker"
 hide_sensitive_logs: false
-runner_name: github-worker
+runner_name: github-worker-rasp
