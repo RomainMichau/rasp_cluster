@@ -5,6 +5,11 @@
     name: wheel
     state: present
 
+- name: Make sure we have a 'docker' group
+  group:
+    name: docker
+    state: present
+
 - name: Allow 'wheel' group to have passwordless sudo
   lineinfile:
     dest: /etc/sudoers
@@ -16,7 +21,7 @@
 - name: Add the user {{item.username}} 
   ansible.builtin.user:
     name: "{{item.username}}"
-    groups: wheel
+    groups: "{{item.groups}}"
     append: yes
     state: present
     createhome: yes
@@ -29,6 +34,7 @@
     password: "{{ item.password }}"
   when: "item.password is defined"
   with_items: "{{ users }}" 
+
   
 
 - name: "Set authorized key took from file for user {{item.username}}"

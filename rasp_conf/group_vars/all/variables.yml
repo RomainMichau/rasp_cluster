@@ -1,7 +1,15 @@
 users:
   - username: "ansible-user"
+    groups:
+    - wheel
   - username: "rmichau"
+    groups:
+    - wheel
   - username: "pi"
     password: "$6$.aXmB946CCEheIEB$4ec70mhJ0Mz71qMlxU.NtFaSl50Hpaa/BBQSXXxP0PFOX47aL.df8Uqw/57N3AbHfvgOqaxGMceZmMhH/bAQo."
-  - username: "github-worker" 
+    groups: 
+    - wheel
+  - username: "github-worker"
+    groups: 
+    - docker 
 dns_ip: 192.168.1.68

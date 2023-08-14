@@ -2,20 +2,12 @@
 
 - name: init raspberry
   hosts: all
-  gather_facts: no
+  gather_facts: yes
   become: true    
   roles:
     - name: common      
   tags:
     - common
-
-- name: init DNS server
-  hosts: dns_server
-  become: true  
-  roles:
-    - name: dnsmasq
-  tags:
-    - dns
 
 - name: Install apache
   hosts: all
@@ -24,39 +16,15 @@
     - name: apache
   tags:
     - apache
-  
-- name: Install Jenkins
-  hosts: jenkins_server
-  become: true  
-  roles:
-    - name: jenkins
-  tags:
-    - jenkins
-
-- name: Install and init postgre
-  hosts: postgres
-  become: true  
-  roles:
-    - name: postgresql
-  tags:
-    - postgresql
-
-- name: Install and init grafana
-  hosts: grafana
-  become: true  
-  roles:
-    - name: grafana
-  tags:
-    - grafana
 
 
-- name: Install and init trilyzer
-  hosts: trilyzer
-  become: true  
-  roles:
-    - name: trilyzer
-  tags:
-    - trilyzer
+# - name: Install and init grafana
+#   hosts: grafana
+#   become: true  
+#   roles:
+#     - name: grafana
+#   tags:
+#     - grafana
 
 - name: Install GitHub Actions Runner
   hosts: github_workers
