@@ -1,0 +1,14 @@
+---
+users:
+- name: chipsy
+  sha256_password: $5$ofaSrojADxd8Ii06$6VIMDYHnUcegzo7a.8MJTqjivQtyRLm6VWoa3gvxtP/
+
+front_ends:
+- domain_name: iseeu.trilyzer.com
+  backend: iseeu
+  id: iseeu
+
+backends:
+- port: 4747
+  name: iseeu
+  host: 192.168.1.6

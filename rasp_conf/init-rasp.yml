@@ -9,13 +9,13 @@
   tags:
     - common
 
-- name: Install apache
-  hosts: all
+- name: Install and conf haproxy
+  hosts: haproxy
   become: true  
   roles:
-    - name: apache
+    - name: haproxy
   tags:
-    - apache
+    - haproxy
 
 
 # - name: Install and init grafana

@@ -1,0 +1,57 @@
+---
+- include_vars: vault.yml
+
+- name: Install HAProxy
+  apt:
+    name: haproxy
+    state: present   
+    
+- name: Install certbot
+  apt:
+    name: certbot
+    state: present   
+
+- name: Install certbot route 53
+  apt:
+    name: python3-certbot-dns-route53
+    state: present   
+
+- name: Copy the generate_certif_haproxy script to the remote server
+  copy:
+    src: generate_certif_haproxy.sh
+    dest: /etc/haproxy/generate_certif_haproxy.sh 
+    owner: root
+    group: root
+    mode: 0744
+
+- name: Run the script
+  command: "/etc/haproxy/generate_certif_haproxy.sh {{ item }} {{ aws_key_id }}  {{ aws_key }}"
+  with_items: "{{ front_ends | json_query('[].domain_name') | unique }}"
+  no_log: True
+  
+- name: Create HAProxy configuration file
+  template:
+    src: haproxy.cfg.j2
+    dest: /etc/haproxy/haproxy.cfg
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+  - restart haproxy
+
+- name: Create HAProxy domain list file
+  template:
+    src: domains_list.txt.j2
+    dest: /etc/haproxy/certs/domains_list.txt
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+  - restart haproxy
+
+    
+- name: Enable and start HAProxy service
+  service:
+    name: haproxy
+    state: started
+    enabled: true

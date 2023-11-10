@@ -1,0 +1,3 @@
+{% for front_end in front_ends %}
+/etc/haproxy/certs/{{ front_end.domain_name }}.pem {{ front_end.domain_name }}
+{% endfor %}

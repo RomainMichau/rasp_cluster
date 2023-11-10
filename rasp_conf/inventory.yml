@@ -25,4 +25,7 @@ all:
     github_workers:
       hosts:
         pi1:
+    haproxy:
+      hosts:
+        pi1:
   

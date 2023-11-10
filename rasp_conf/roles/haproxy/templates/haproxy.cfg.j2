@@ -1,0 +1,53 @@
+global
+    log /dev/log    local0
+    log /dev/log    local1 notice
+    chroot /var/lib/haproxy
+    stats timeout 30s
+    user haproxy
+    group haproxy
+    daemon
+
+defaults
+    log global
+    mode    http
+    option  httplog
+    option  dontlognull
+    timeout connect 5000
+    timeout client  50000
+    timeout server  50000
+
+userlist mycredentials
+{% for user in users %}
+   user {{ user.name }} password {{ user.sha256_password }}
+{% endfor %}
+
+
+frontend https
+    bind :80
+    bind *:443 ssl crt-list /etc/haproxy/certs/domains_list.txt
+    http-request redirect scheme https unless { ssl_fc }
+    mode http
+    http-request add-header X-Forwarded-Proto https
+    http-request auth unless { http_auth(mycredentials) }
+{% for front_end in front_ends %}
+# Front {{ front_end.domain_name }}
+acl host_{{ front_end.id }} hdr(host) -i {{ front_end.domain_name }}
+
+{% if front_end.path_start_with is defined %}
+acl path_{{ front_end.id }} path_beg {{ front_end.path_start_with }}
+use_backend {{ front_end.backend }} if host_{{ front_end.id }} path_{{ front_end.id }}
+
+{% elif front_end.path_no_start_with is defined %}
+acl no_path_{{ front_end.id }} path_beg {{ front_end.path_no_start_with }}
+use_backend {{ front_end.backend }} if host_{{ front_end.id }} !no_path_{{ front_end.id }}
+
+{% else %}
+use_backend {{ front_end.backend }} if host_{{ front_end.id }}
+{% endif %}
+
+{% endfor %}
+
+{% for backend in backends %}
+backend {{ backend.name }}
+    server {{ backend.name }} {{ backend.host }}:{{ backend.port }} check
+{% endfor %}
